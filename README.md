@@ -4,9 +4,9 @@ Minimal AI-powered CLI that can read/search files and, with explicit approval, c
 
 ## Demo
 
-<video src="demo.mp4" width="720" controls></video>
+[![Watch the demo](demo.gif)](demo.mp4)
 
-If the video does not render in your viewer, you can download or open it directly: [demo.mp4](demo.mp4)
+If the GIF does not load or you need audio, open the video directly: [demo.mp4](demo.mp4)
 
 ## Features
 - Minimal interactive or one-shot CLI
