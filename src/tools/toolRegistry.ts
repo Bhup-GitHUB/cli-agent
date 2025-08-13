@@ -21,4 +21,23 @@ export const toolRegistry = [
     required: ["pattern"],
     type: Object,
   },
+  {
+    name: "write_file",
+    description: "Write a file to an absolute path; creates parent directories if needed.",
+    toolOptions: {
+      absolutePath: { type: String },
+      content: { type: String },
+    },
+    required: ["absolutePath", "content"],
+    type: Object,
+  },
+  {
+    name: "mkdir",
+    description: "Create a directory recursively at an absolute path.",
+    toolOptions: {
+      absolutePath: { type: String },
+    },
+    required: ["absolutePath"],
+    type: Object,
+  },
 ];

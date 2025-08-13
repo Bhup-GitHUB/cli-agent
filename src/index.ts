@@ -3,9 +3,10 @@
 import { program } from "commander";
 import dotenv from "dotenv";
 import readline from "node:readline";
+import path from "node:path";
 import { Processor } from "./processor";
 
-dotenv.config({});
+dotenv.config({ path: path.resolve(__dirname, "../.env") });
 
 program
   .name("simple-ai")

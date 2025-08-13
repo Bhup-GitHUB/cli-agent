@@ -1,6 +1,8 @@
 import { z } from "zod";
 import { readFileTool } from "./readFileTool";
 import { grepTool } from "./grepTool";
+import { writeFileTool } from "./writeFileTool";
+import { mkdirTool } from "./mkdirTool";
 
 export const ReadFileSchema = z.object({
   tool: z.literal("read_file"),
@@ -20,9 +22,26 @@ export const GrepSchema = z.object({
   }),
 });
 
+export const WriteFileSchema = z.object({
+  tool: z.literal("write_file"),
+  toolOptions: z.object({
+    absolutePath: z.string().min(1),
+    content: z.string(),
+  }),
+});
+
+export const MkdirSchema = z.object({
+  tool: z.literal("mkdir"),
+  toolOptions: z.object({
+    absolutePath: z.string().min(1),
+  }),
+});
+
 export type ToolCall =
   | z.infer<typeof ReadFileSchema>
-  | z.infer<typeof GrepSchema>;
+  | z.infer<typeof GrepSchema>
+  | z.infer<typeof WriteFileSchema>
+  | z.infer<typeof MkdirSchema>;
 
 export async function validateAndRunToolCall(
   jsonData: unknown,
@@ -44,6 +63,20 @@ export async function validateAndRunToolCall(
     const p = GrepSchema.safeParse(data);
     if (!p.success) return { success: false, error: p.error.message } as const;
     const result = await grepTool(p.data.toolOptions);
+    return { success: true, result } as const;
+  }
+
+  if (data.tool === "write_file") {
+    const p = WriteFileSchema.safeParse(data);
+    if (!p.success) return { success: false, error: p.error.message } as const;
+    const result = writeFileTool(p.data.toolOptions);
+    return { success: true, result } as const;
+  }
+
+  if (data.tool === "mkdir") {
+    const p = MkdirSchema.safeParse(data);
+    if (!p.success) return { success: false, error: p.error.message } as const;
+    const result = mkdirTool(p.data.toolOptions);
     return { success: true, result } as const;
   }
 

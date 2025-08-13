@@ -18,9 +18,11 @@ export class Processor {
       .slice(-6)
       .map((m) => `${m.role}: ${m.content}`)
       .join("\n");
+    const latestUser = [...this.history].reverse().find((m) => m.role === "user")?.content ?? "";
     return [
       BASE_PROMPT,
       `CWD: ${this.rootDir}`,
+      `LatestUser: ${latestUser}`,
       `Tools:\n${JSON.stringify(toolRegistry)}`,
       recent ? `--- Recent ---\n${recent}` : "",
       TOOL_SELECTION_PROMPT,
@@ -37,12 +39,13 @@ export class Processor {
 
   async processQuery(query: string) {
     this.history.push({ role: "user", content: query });
+    const allowWrite = /\bALLOW_WRITE\b/i.test(query);
     while (true) {
       const response = await this.llm.streamResponse(this.buildPrompt());
       let toolCalls: any;
       try {
         let clean = response.trim();
-        if (clean.startsWith("```"))
+        if (clean.startsWith("```") )
           clean = clean
             .replace(/^```[a-zA-Z]*\n?/, "")
             .replace(/```$/, "")
@@ -65,6 +68,13 @@ export class Processor {
 
       for (const call of toolCalls) {
         if (call && typeof call === "object" && "tool" in call) {
+          if (!allowWrite && (call.tool === "write_file" || call.tool === "mkdir")) {
+            this.history.push({
+              role: "model",
+              content: `Write disabled. Re-run your request including the token ALLOW_WRITE to enable writing. Blocked: ${JSON.stringify(call)}`,
+            });
+            continue;
+          }
           try {
             const res = await validateAndRunToolCall(call, this.rootDir);
             const text = res.success
