@@ -2,6 +2,12 @@
 
 Minimal AI-powered CLI that can read/search files and, with explicit approval, create files and folders. Uses Google Generative AI via the `ai` SDK.
 
+## Demo
+
+<video src="demo.mp4" width="720" controls></video>
+
+If the video does not render in your viewer, you can download or open it directly: [demo.mp4](demo.mp4)
+
 ## Features
 - Minimal interactive or one-shot CLI
 - Tools:
